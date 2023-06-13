@@ -9,7 +9,7 @@ class User < ApplicationRecord
   end
 
   def agency_name
-    agency.name if agency
+     agency.name if agency
   end
 end
 

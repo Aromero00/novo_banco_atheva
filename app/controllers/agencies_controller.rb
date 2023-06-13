@@ -5,12 +5,12 @@ class AgenciesController < ApplicationController
   def index
     @agencies = Agency.all
 
-    render json: @agencies, methods: [:region_name, :total_users]
+    render json: @agencies, methods: [ :region_name, :total_users]
   end
 
   # GET /agencies/1
   def show
-    render json: @agency, methods: [:region_name, :total_users]
+    render json: @agency, methods: [ :region_name, :total_users]
   end
 
 

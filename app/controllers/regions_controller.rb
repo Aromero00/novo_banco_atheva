@@ -5,12 +5,12 @@ class RegionsController < ApplicationController
   def index
     @regions = Region.all
 
-    render json: @regions, methods: [:total_users, :total_agencies]
+    render json: @regions, methods: [ :total_users, :total_agencies]
   end
 
   # GET /regions/1
   def show
-    render json: @region, methods: [:total_users, :total_agencies]
+    render json: @region, methods: [ :total_users, :total_agencies]
   end
 
 

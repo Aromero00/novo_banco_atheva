@@ -7,7 +7,7 @@ class Region < ApplicationRecord
   end
 
   def total_agencies
-    agencies.count
+     agencies.count
   end
 end
 
