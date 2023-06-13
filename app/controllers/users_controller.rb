@@ -3,6 +3,7 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
+    params[:region_id]
     @users = User.all
 
     render json: @users, methods: [:region_name, :agency_name]

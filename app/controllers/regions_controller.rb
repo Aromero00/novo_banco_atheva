@@ -1,28 +1,18 @@
 class RegionsController < ApplicationController
-  before_action :set_region, only: [:show, :update, :destroy, :total_users, :total_agencies]
+  before_action :set_region, only: [:show, :update, :destroy]
 
   # GET /regions
   def index
     @regions = Region.all
 
-    render json: @regions
+    render json: @regions, methods: [:total_users, :total_agencies]
   end
 
   # GET /regions/1
   def show
-    render json: @region
-  end
-  #GET /regions/1/total_users
-  def total_users
-    total = @region.users.count
-    render json: { total_users: total }
+    render json: @region, methods: [:total_users, :total_agencies]
   end
 
-  # GET /regions/1/total_agencies
-  def total_agencies
-    total = @region.agencies.count
-    render json: { total_agencies: total }
-  end
 
   # POST /regions
   def create
