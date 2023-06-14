@@ -11,6 +11,10 @@ class User < ApplicationRecord
   def agency_name
      agency.name if agency
   end
+
+  def total_transactions
+    transactions.where("created_at >= ?", 1.days.ago).count
+  end
 end
 
 

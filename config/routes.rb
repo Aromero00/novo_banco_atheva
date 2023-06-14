@@ -7,11 +7,11 @@ Rails.application.routes.draw do
           end
 
           resources :agencies do
-            get 'total_users', on: :member
+            resources :users, only: [:index], controller: 'users', action: 'index_by_agency'
           end
 
           resources :users do
-            resources :transactions, only: [:index]
+            resources :transactions, only: [:index], controller: 'transactions', action: 'index_by_user'
           end
 
           resources :transactions, only: [:create, :destroy]

@@ -8,6 +8,13 @@ class TransactionsController < ApplicationController
     render json: @transactions,methods: [:user_name]
   end
 
+  def index_by_user
+    @user = User.find(params[:user_id])
+    @transactions = @user.transactions
+
+    render json: @transactions, methods: [:user_name]
+  end
+
   # GET /transactions/1
   def show
     render json: @transaction

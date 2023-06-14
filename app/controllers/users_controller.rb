@@ -3,15 +3,25 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
-    params[:region_id]
-    @users = User.all
+    if params[:agency_id]
+      @users = User.where(agency_id: params[:agency_id])
+    else
+      @users = User.all
+    end
 
-    render json: @users, methods: [:region_name, :agency_name]
+    render json: @users, methods: [:region_name, :agency_name, :total_transactions]
+  end
+
+  def index_by_agency
+    @agency = Agency.find(params[:agency_id])
+    @users = @agency.users
+
+    render json: @users, methods: [:region_name, :agency_name, :total_transactions]
   end
 
   # GET /users/1
   def show
-    render json: @user, methods: [:region_name, :agency_name]
+    render json: @users, methods: [:region_name, :agency_name, :total_transactions]
   end
 
   # POST /users
