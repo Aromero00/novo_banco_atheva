@@ -2,17 +2,21 @@ class TransactionsController < ApplicationController
   before_action :set_transaction, only: %i[ show update destroy ]
 
   # GET /transactions
+  # GET /transactions
   def index
-    @transactions = Transaction.all
+    @transactions = Transaction.joins(:user)
+                               .select('transactions.*, users.name AS user_name')
 
-    render json: @transactions,methods: [:user_name]
+    render json: @transactions
   end
+
 
   def index_by_user
     @user = User.find(params[:user_id])
-    @transactions = @user.transactions
+    @transactions = @user.transactions.joins(:user)
+                                      .select('transactions.*, users.name AS user_name')
 
-    render json: @transactions, methods: [:user_name]
+    render json: @transactions
   end
 
   # GET /transactions/1
@@ -23,8 +27,11 @@ class TransactionsController < ApplicationController
   # POST /transactions
   def create
     @transaction = Transaction.new(transaction_params)
+    user = User.find(transaction_params[:user_id])
 
-    if @transaction.save
+    if user.status == 'deletado'
+      render json: { error: 'Usuário marcado como deletado. Não é possível fazer transações.' }, status: :unprocessable_entity
+    elsif @transaction.save
       update_user_balance(@transaction) # Atualiza o saldo do usuário
       render json: @transaction, status: :created, location: @transaction
     else

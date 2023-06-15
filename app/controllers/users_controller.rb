@@ -3,34 +3,16 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
-    if params[:agency_id]
-      @users = User.joins(:region, :agency)
-                   .left_joins(:transactions)
-                   .where(agency_id: params[:agency_id])
-                   .select('users.*, regions.name AS region_name, agencies.name AS agency_name,
-                          COUNT(transactions.id) AS total_transactions')
-                   .where('transactions.created_at >= ?', 30.days.ago)
-                   .group('users.id, regions.name, agencies.name')
-    else
-      @users = User.joins(:region, :agency)
-                   .left_joins(:transactions)
-                   .select('users.*, regions.name AS region_name, agencies.name AS agency_name,
-                          COUNT(transactions.id) AS total_transactions')
-                   .where('transactions.created_at >= ?', 30.days.ago)
-                   .group('users.id, regions.name, agencies.name')
-    end
+    @users = User.joins(:region, :agency)
+                 .joins("left join transactions on users.id = transactions.user_id and transactions.created_at >= '#{30.days.ago}'")
+                 .select("users.*, regions.name AS region_name, agencies.name AS agency_name,
+                        COUNT(transactions.id) AS total_transactions")
+                 .group('users.id, regions.name, agencies.name')
+
+    @users = @users.where(agency_id: params[:agency_id]) if params[:agency_id]
 
     render json: @users
   end
-  def index_by_agency
-    @agency = Agency.find(params[:agency_id])
-    @users = @agency.users.joins(:region, :agency)
-                    .select('users.*, regions.name AS region_name, agencies.name AS agency_name')
-
-
-    render json: @users
-  end
-
 
   # GET /users/1
   def show
@@ -59,7 +41,11 @@ class UsersController < ApplicationController
 
   # DELETE /users/1
   def destroy
-    @user.destroy
+    if @user.update(status: 'deletado')
+      render json: { message: 'Usuário marcado como deletado' }
+    else
+      render json: @user.errors, status: :unprocessable_entity
+    end
   end
 
   private
@@ -69,7 +55,7 @@ class UsersController < ApplicationController
     end
 
     # Only allow a list of trusted parameters through.
-    def user_params
-      params.require(:user).permit(:name, :cpf, :region_id, :agency_id, :balance, :status)
-    end
+  def user_params
+    params.require(:user).permit(:name, :cpf, :region_id, :agency_id, :status).merge(balance: 0)
+  end
 end

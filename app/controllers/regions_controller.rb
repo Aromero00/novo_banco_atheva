@@ -19,7 +19,7 @@ class RegionsController < ApplicationController
     @region = Region.new(region_params)
 
     if @region.save
-      render json: @region, status: :created, location: @region
+      render json: @region, status: :created
     else
       render json: @region.errors, status: :unprocessable_entity
     end

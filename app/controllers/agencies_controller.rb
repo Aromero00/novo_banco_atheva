@@ -3,9 +3,12 @@ class AgenciesController < ApplicationController
 
   # GET /agencies
   def index
-    @agencies = Agency.all
+    @agencies = Agency.joins(:region)
+                      .left_joins(:users)
+                      .select('agencies.*, regions.name AS region_name, COUNT(users.id) AS total_users')
+                      .group('agencies.id, regions.name')
 
-    render json: @agencies, methods: [ :region_name, :total_users]
+    render json: @agencies
   end
 
   # GET /agencies/1
