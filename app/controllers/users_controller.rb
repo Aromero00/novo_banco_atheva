@@ -4,20 +4,33 @@ class UsersController < ApplicationController
   # GET /users
   def index
     if params[:agency_id]
-      @users = User.where(agency_id: params[:agency_id])
+      @users = User.joins(:region, :agency)
+                   .left_joins(:transactions)
+                   .where(agency_id: params[:agency_id])
+                   .select('users.*, regions.name AS region_name, agencies.name AS agency_name,
+                          COUNT(transactions.id) AS total_transactions')
+                   .where('transactions.created_at >= ?', 30.days.ago)
+                   .group('users.id, regions.name, agencies.name')
     else
-      @users = User.all
+      @users = User.joins(:region, :agency)
+                   .left_joins(:transactions)
+                   .select('users.*, regions.name AS region_name, agencies.name AS agency_name,
+                          COUNT(transactions.id) AS total_transactions')
+                   .where('transactions.created_at >= ?', 30.days.ago)
+                   .group('users.id, regions.name, agencies.name')
     end
 
-    render json: @users, methods: [:region_name, :agency_name, :total_transactions]
+    render json: @users
   end
-
   def index_by_agency
     @agency = Agency.find(params[:agency_id])
-    @users = @agency.users
+    @users = @agency.users.joins(:region, :agency)
+                    .select('users.*, regions.name AS region_name, agencies.name AS agency_name')
 
-    render json: @users, methods: [:region_name, :agency_name, :total_transactions]
+
+    render json: @users
   end
+
 
   # GET /users/1
   def show
